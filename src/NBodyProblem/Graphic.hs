@@ -1,4 +1,4 @@
-module Graphic where
+module NBodyProblem.Graphic where
     
 import Graphics.UI.GLUT
 import Graphics.Rendering.OpenGL

@@ -4,15 +4,15 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 
-name:           NbodyProblem
+name:           NbodyProblem1
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/NbodyProblem1#readme>
 homepage:       https://github.com/githubuser/NbodyProblem1#readme
 bug-reports:    https://github.com/githubuser/NbodyProblem1/issues
-author:         Artem Mamedov
-maintainer:     a.mamedov1@g.nsu.ru
-copyright:      2023 Artem Mamedov
-license:        GPL-3
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2023 Author name here
+license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
@@ -21,15 +21,16 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/MamedovAR/NbodyProblem1
+  location: https://github.com/githubuser/NbodyProblem1
 
 library
   exposed-modules:
-      NBodyProblem
+      NBodyProblem.BurnesAndHut
+      NBodyProblem.Graphic
   other-modules:
-      src/NBodyProblem
+      Paths_NbodyProblem1
   hs-source-dirs:
-      src/NBodyProblem
+      src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
