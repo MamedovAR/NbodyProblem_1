@@ -34,6 +34,8 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
+	  , GLUT
+	  , OpenGL
   default-language: Haskell2010
 
 executable NbodyProblem1-exe
@@ -44,8 +46,7 @@ executable NbodyProblem1-exe
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      NbodyProblem1
-    , base >=4.7 && <5
+      NbodyProblem1, base, GLUT, OpenGL, hmatrix, random
   default-language: Haskell2010
 
 test-suite NbodyProblem1-test
@@ -57,6 +58,5 @@ test-suite NbodyProblem1-test
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      NbodyProblem1
-    , base >=4.7 && <5
+      NbodyProblem1, base, QuickCheck, GLUT, OpenGL
   default-language: Haskell2010
