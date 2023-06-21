@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 module NBodyProblem.Graphic where
     
 import Graphics.UI.GLUT

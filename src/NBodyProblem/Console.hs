@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 module NBodyProblem.Console where
 
 import NBodyProblem.BurnesAndHut

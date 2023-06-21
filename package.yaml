@@ -1,10 +1,10 @@
 name:                NbodyProblem1
 version:             0.1.0.0
-github:              "githubuser/NbodyProblem1"
-license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2023 Author name here"
+github:              "MamedovAR/NbodyProblem_1"
+license:             LGPL-3
+author:              "Artem Mamedov"
+maintainer:          "a.mamedov1@g.nsu.ru"
+copyright:           "2023 Artem Mamedov"
 
 extra-source-files:
 - README.md
@@ -21,6 +21,9 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
+- GLUT
+- OpenGL
+- QuickCheck
 
 ghc-options:
 - -Wall
@@ -34,7 +37,7 @@ ghc-options:
 - -Wredundant-constraints
 
 library:
-  source-dirs: src
+  source-dirs: src/NBodyProblem
 
 executables:
   NbodyProblem1-exe:
@@ -46,6 +49,8 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - NbodyProblem1
+    - GLUT
+    - OpenGL
 
 tests:
   NbodyProblem1-test:
@@ -57,3 +62,6 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - NbodyProblem1
+    - QuickCheck
+    - GLUT
+    - OpenGL
