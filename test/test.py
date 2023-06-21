@@ -2,9 +2,6 @@ import sys
 from copy import deepcopy
 from numpy import array
 from numpy.linalg import norm
-from numpy import random
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 class Node:
 # A node represents a body if it is an endnote (i.e. if node.child is None)
