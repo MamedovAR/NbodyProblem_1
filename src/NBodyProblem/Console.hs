@@ -1,5 +1,14 @@
+module NBodyProblem.Console where
+
 import NBodyProblem.BurnesAndHut
 import System.IO.Unsafe
+import System.Cmd
+
+#ifdef _WIN32
+clearConsole = system "clr"
+#else
+clearConsole = system "clear"
+#endif
 
 showList :: [[Float]] -> IO ()
 showList lst = do
@@ -25,5 +34,6 @@ mainFunc bodies theta g dt max_iter sps = do
 		let bodies' = map (\b -> unsafePerformIO $ resetTo0thQuadrant b >> add b root) bodies
 		verlet bodies root theta g dt
 		lst <- createList bodies []
+		clearConsole
 		showList lst 380
 		return $ unsafePerformIO $ mainFunc bodies theta g dt (max_iter) (sps++[lst])
