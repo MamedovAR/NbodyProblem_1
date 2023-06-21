@@ -3,10 +3,9 @@ module Main (main) where
 import NBodyProblem.BurnesAndHut
 import NBodyProblem.Graphic
 import System.Random
-import Numeric.LinearAlgebra
 
 norm :: [Float] -> Float
-norm v = norm_2 $ fromList v
+norm xs = sqrt $ sum $ map (^2) xs
 
 -- Theta-criterion of the Barnes-Hut algorithm.
 theta = 0.5

@@ -46,7 +46,7 @@ executable NbodyProblem1-exe
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      NbodyProblem1, base, GLUT, OpenGL, hmatrix, random
+      NbodyProblem1, base, GLUT, OpenGL, random
   default-language: Haskell2010
 
 test-suite NbodyProblem1-test
