@@ -36,21 +36,22 @@ mainFunc :: [IORef Node] -> Float -> Float -> Float -> Int -> [[[Float]]] -> IO 
 mainFunc bodies theta g dt max_iter sps = do
 	if max_iter==0 then do{return sps} else do
 		root <- newIORef NoneNode
-		rootInit root bodies
-		root' <- readIORef root
+		root' <- rootInit root bodies
+		root'' <- readIORef root'
 --		let bodies' = map (\b -> unsafePerformIO $ resetTo0thQuadrant b >> add b root) bodies
-		verlet bodies root' theta g dt
+		verlet bodies root'' theta g dt
 		lst <- createList bodies []
 		clearConsole
 		showLst lst-- 380
 		return $ unsafePerformIO $ mainFunc bodies theta g dt (max_iter) (sps++[lst])
 
-rootInit :: IORef Node -> [IORef Node] -> IO ()
+rootInit :: IORef Node -> [IORef Node] -> IO (IORef Node)
 rootInit root (body:bodies) = do
-	if null bodies then
+	if null bodies then do
 		resetTo0thQuadrant body
-		add body root
-	else
+		res <- add body root
+		return res
+	else do
 		resetTo0thQuadrant body
-		add body root
-		rootInit root bodies
+		res <- add body root
+		rootInit res bodies

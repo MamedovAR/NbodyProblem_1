@@ -10,7 +10,7 @@ import Data.IORef
 --showWindow :: [[Float]] -> IO ()
 showWindow lst = do
     tstamp <- getTimestamp
-    st <- newIORef (0.0, tstamp)
+    st <- newIORef (0.0, 0, tstamp)
     getArgsAndInitialize
     createAwindow "Alghoritm" st lst
     mainLoop
@@ -21,11 +21,14 @@ createAwindow name st lst = do
     idleCallback $= Just (idle st)
     mainLoop
 
+getFrst [] = []
+getFrst xs = head xs
+
 display st lst = do
-    (dy, _) <- readIORef st
+    (dy, dt, _) <- readIORef st
     clear [ColorBuffer]
     clearColor $= Color4 0 0 0 0
-    renderPrimitive Points $ mapM_ drawPoint $ [map (\a -> a ++ [0]) x | x <- lst] !! 0
+    renderPrimitive Points $ mapM_ drawPoint $ getFrst [map (\a -> a ++ [0]) x | x <- if dt < 0.0000000001 then lst else tail lst]
     flush
 
 drawPoint :: [GLfloat] -> IO ()
@@ -39,9 +42,9 @@ getTimestamp = do
     return $ fromRational $ toRational now
 
 idle st = do
-    (dy, prevTStamp) <- get st
+    (dy, dt1, prevTStamp) <- get st
     tstamp <- getTimestamp
     let dt = tstamp - prevTStamp
-        dy' = dy + dt
-    writeIORef st (dy', tstamp)
+        dy' = if dt > 0.0000000001 then dy + dt else dy
+    writeIORef st (dy', if dt > 0.0000000001 then tstamp else prevTStamp, tstamp)
     postRedisplay Nothing
