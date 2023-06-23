@@ -27,6 +27,7 @@ library
   exposed-modules:
       NBodyProblem.BurnesAndHut
       NBodyProblem.Graphic
+      NBodyProblem.Console
   other-modules:
       Paths_NbodyProblem1
   hs-source-dirs:
@@ -36,27 +37,30 @@ library
       base >=4.7 && <5
 	  , GLUT
 	  , OpenGL
+      , time
+      , process
+      , directory
   default-language: Haskell2010
 
 executable NbodyProblem1-exe
   main-is: Main.hs
   other-modules:
-      Paths_NbodyProblem1
+      NBodyProblem
   hs-source-dirs:
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      NbodyProblem1, base, GLUT, OpenGL, random
+      NbodyProblem1, base, GLUT, OpenGL, random, time, process, directory
   default-language: Haskell2010
 
 test-suite NbodyProblem1-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Paths_NbodyProblem1
+      NBodyProblem
   hs-source-dirs:
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      NbodyProblem1, base, QuickCheck, GLUT, OpenGL
+      NbodyProblem1, base, QuickCheck, GLUT, OpenGL, time, process, directory
   default-language: Haskell2010
