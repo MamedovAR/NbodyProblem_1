@@ -36,7 +36,7 @@ jobs:
     - name: Install dependencies
       run: |
         stack update
-        stack build . --only-dependencies --enable-tests --enable-benchmarks
+        stack build . --only-dependencies # --enable-tests --enable-benchmarks
     - name: Build
       run: stack build . --enable-tests --enable-benchmarks all
     - name: Run tests
