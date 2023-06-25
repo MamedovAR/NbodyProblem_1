@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP #-}
 
-module NBodyProblem.Console where
+module Console where
 
 import NBodyProblem.BurnesAndHut
 import System.IO.Unsafe

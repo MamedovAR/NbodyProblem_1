@@ -1,7 +1,7 @@
 
 {-# LANGUAGE CPP #-}
 
-module NBodyProblem.Graphic where 
+module Graphic where 
     
 import Graphics.UI.GLUT
     ( mainLoop,
