@@ -70,11 +70,14 @@ tester1 [k,x,y] = do
         "node.into_next_quadrant()\n" ++
         "f.write(str(node.m)+'\\n'+str(node.s)+'\\n'+str(node.m_pos[0])+'\\n'+str(node.m_pos[1])+'\\n'+str(node.momentum[0])+'\\n'+str(node.momentum[1]))\n"
     system ("python .nbodyproblem/test.py " ++ show k ++ " " ++ show x ++ " " ++ show y)
-    answers <- readFile "file_test.txt"
+    answers <- readFile ".nbodyproblem/file_test.txt"
     let ans = lines answers
     removeDirectoryRecursive ".nbodyproblem"
     node1 <- readIORef nodeIO
     let l2 = [m node1,s node1,(m_pos node1) !! 0,(m_pos node1) !! 1,(momentum node1) !! 0,(momentum node1) !! 1]
+    putStrLn "----------------------------------------------"
+    print $ map reader ans
+    print $ l1++l2
     return ((map reader ans)==(l1++l2))
 
 tester :: [Float] -> Bool

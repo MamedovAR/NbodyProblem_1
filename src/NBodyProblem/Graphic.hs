@@ -1,50 +1,74 @@
+
 {-# LANGUAGE CPP #-}
 
-module NBodyProblem.Graphic where
+module NBodyProblem.Graphic where 
     
 import Graphics.UI.GLUT
-import Graphics.Rendering.OpenGL
-import Data.Time.Clock.POSIX
-import Data.IORef
+    ( mainLoop,
+      idleCallback,
+      displayCallback,
+      getArgsAndInitialize,
+      createWindow,
+      postRedisplay,
+      renderPrimitive,
+      flush,
+      clear,
+      clearColor,
+      currentColor,
+      destroyWindow,
+      ClearBuffer(ColorBuffer),
+      PrimitiveMode(Points),
+      Vertex2(Vertex2),
+      Color4(Color4),
+      Vertex(vertex),
+      GLfloat,
+      HasSetter(($=)) )
+import Data.IORef ( IORef, newIORef, readIORef, writeIORef, modifyIORef )
+import Control.Concurrent (threadDelay)
 
---showWindow :: [[Float]] -> IO ()
+showWindow :: IORef [[[Float]]] -> IO ()
 showWindow lst = do
-    tstamp <- getTimestamp
-    st <- newIORef (0.0, 0, tstamp)
-    getArgsAndInitialize
+    lst' <- readIORef lst
+    st <- newIORef $ head lst'
+    _ <- getArgsAndInitialize
     createAwindow "Alghoritm" st lst
     mainLoop
 
+createAwindow :: String -> IORef [[GLfloat]] -> IORef [[[GLfloat]]] -> IO ()
 createAwindow name st lst = do
-    createWindow name
-    displayCallback $= display st lst
-    idleCallback $= Just (idle st)
-    mainLoop
+    window <- createWindow name
+    displayCallback $= display st
+    idleCallback $= Just (idle st lst)
+    lst'' <- readIORef lst
+    if null lst'' 
+        then destroyWindow window
+        else mainLoop
 
+getFrst :: [[a]] -> [a]
 getFrst [] = []
 getFrst xs = head xs
 
-display st lst = do
-    (dy, dt, _) <- readIORef st
+getTail :: [[a]] -> [[a]]
+getTail [] = []
+getTail xs = tail xs
+
+display :: IORef [[Float]] -> IO ()
+display st = do
+    xs <- readIORef st
     clear [ColorBuffer]
     clearColor $= Color4 0 0 0 0
-    renderPrimitive Points $ mapM_ drawPoint $ getFrst [map (\a -> a ++ [0]) x | x <- if dt < 0.0000000001 then lst else tail lst]
+    renderPrimitive Points $ mapM_ drawPoint xs
+    threadDelay 500000 -- ожидание 0.5 секунды
     flush
 
 drawPoint :: [GLfloat] -> IO ()
-drawPoint [x, y, z] = do
+drawPoint xs = do
     currentColor $= Color4 0 0 1 0
-    vertex (Vertex3 x y z)
+    vertex (Vertex2 (head xs) (xs!!1))
 
-getTimestamp :: IO GLfloat
-getTimestamp = do
-    now <- getPOSIXTime
-    return $ fromRational $ toRational now
-
-idle st = do
-    (dy, dt1, prevTStamp) <- get st
-    tstamp <- getTimestamp
-    let dt = tstamp - prevTStamp
-        dy' = if dt > 0.0000000001 then dy + dt else dy
-    writeIORef st (dy', if dt > 0.0000000001 then tstamp else prevTStamp, tstamp)
+idle :: IORef [[Float]] -> IORef [[[Float]]] -> IO ()
+idle st lst = do
+    lst' <- readIORef lst
+    writeIORef st $ getFrst lst'
+    modifyIORef lst getTail
     postRedisplay Nothing

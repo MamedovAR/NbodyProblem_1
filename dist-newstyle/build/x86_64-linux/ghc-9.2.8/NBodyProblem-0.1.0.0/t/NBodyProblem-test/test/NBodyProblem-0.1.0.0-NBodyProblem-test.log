@@ -1,7 +1,15 @@
 Test suite NBodyProblem-test: RUNNING...
-python: can't open file 'test.py': [Errno 2] No such file or directory
-*** Failed! Exception: 'file_test.txt: openFile: does not exist (No such file or directory)' (after 1 test):
+/home/mar/NbodyProblem_1
+/home/mar/NbodyProblem_1
+.nbodyproblem/test.py:17: RuntimeWarning: invalid value encountered in divide
+  return self.m_pos / self.m
+----------------------------------------------
+[0.5998635,1.0,0.29993176,0.29993176,0.0,0.0,0.5998635,0.5,0.29993176,0.29993176,0.0,0.0]
+[0.5998635,1.0,0.5,0.5,0.0,0.0,0.5998635,0.5,0.5,0.5,0.0,0.0]
+----------------------------------------------
+[0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.5,0.0,0.0,0.0,0.0]
+[0.0,1.0,0.5,0.5,0.0,0.0,0.0,0.5,0.5,0.5,0.0,0.0]
+*** Failed! Falsified (after 1 test and 1 shrink):
 0.0
-[32mACCEPTED![37m
 Test suite NBodyProblem-test: PASS
 Test suite logged to: /home/mar/NbodyProblem_1/dist-newstyle/build/x86_64-linux/ghc-9.2.8/NBodyProblem-0.1.0.0/t/NBodyProblem-test/test/NBodyProblem-0.1.0.0-NBodyProblem-test.log

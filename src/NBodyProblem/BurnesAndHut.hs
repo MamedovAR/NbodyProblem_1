@@ -1,3 +1,4 @@
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  NBodyProblem.BurnesAndHut
@@ -125,7 +126,7 @@ forceOn1 body node theta
 
 -- | Execute a time iteration according to the Verlet algorithm.
 verlet :: [IORef Node] -> Node -> Float -> Float -> Float -> IO ()
-verlet (bodies) root theta g dt = 
+verlet bodies root theta g dt = 
  if null bodies then return () else do
   let body = head bodies
   body' <- readIORef body

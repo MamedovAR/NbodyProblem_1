@@ -6,6 +6,7 @@ import NBodyProblem.Console
 import System.Environment
 import System.Random
 import Data.IORef
+import GHC.IORef (newIORef)
 
 norm :: [Float] -> Float
 norm xs = sqrt $ sum $ map (^2) xs
@@ -61,3 +62,6 @@ main = do
 	bodies' <- preBodies bodies []
 	res <- mainFunc bodies' theta _G dt max_iter []
 	if length args == 2 then do{writeFile (last args) $ createStr res} else do{putStrLn ""}
+	resRef <- newIORef res
+	showWindow resRef
+	return ()
