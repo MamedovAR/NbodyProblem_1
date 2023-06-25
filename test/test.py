@@ -1,3 +1,4 @@
+import os
 import sys
 from copy import deepcopy
 from numpy import array
@@ -59,7 +60,7 @@ class Node:
         return quadrant
 
 node = Node(float(sys.argv[1]),float(sys.argv[2]),float(sys.argv[3]))
-f=open("file_test.txt","w")
+f=open("~/.nbodyproblem/file_test.txt","w")
 f.write(node.m,'\n',node.s,'\n',node.m_pos[0],'\n',node.m_pos[1],'\n',node.momentum[0],'\n',node.momentum[1],'\n')
 node.reset_to_0th_quadrant()
 node.into_next_quadrant()

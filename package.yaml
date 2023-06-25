@@ -1,4 +1,4 @@
-name:                NbodyProblem1
+name:                NBodyProblem
 version:             0.1.0.0
 github:              "MamedovAR/NbodyProblem_1"
 license:             LGPL-3
@@ -48,7 +48,7 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - NbodyProblem1
+    - NBodyProblem
     - GLUT
     - OpenGL
 
@@ -61,7 +61,7 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - NbodyProblem1
+    - NBodyProblem
     - QuickCheck
     - GLUT
     - OpenGL

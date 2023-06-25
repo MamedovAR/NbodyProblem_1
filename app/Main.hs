@@ -1,4 +1,4 @@
-module Main (main) where
+module Main where
 
 import NBodyProblem.BurnesAndHut
 import NBodyProblem.Graphic
@@ -44,15 +44,15 @@ preBodies (x:xs) ys = do
 	y <- newIORef x
 	if null xs 
 		then return (ys++[y]) 
-		else return $ unsafePerformIO $ preBodies xs (ys++[y])
+		else preBodies xs (ys++[y])
 
 help :: String
 help = "Simple Haskell implementation of a Barnes-Hut galaxy simulator.\n\n./NBodyProblem [OPTION] [OUTPUT]\n\n\t-h, --help - Show supported options.\n" ++ 
 	"\t-o, --out OUTPUT - write all iterations in one csv-file.\n"
 
 createStr :: [[[Float]]] -> String
-createStr lst = (init $ concat [show x ++ "x," ++ show x ++ "y," ++ show x "z," | x <- [0..length lst]]) ++ 
-	"\n" ++ unlines $ map (\lst1 -> init $ concat [show x ++ "," ++ show y ++ ",0," | [x,y] <- lst1]) lst
+createStr lst = (init $ concat [show x ++ "x," ++ show x ++ "y," ++ show x ++ "z," | x <- [0..length lst]]) ++ 
+	"\n" ++ (unlines $ map (\lst1 -> init $ concat [show x ++ "," ++ show y ++ ",0," | [x,y] <- lst1]) lst)
 
 main :: IO ()
 main = do
