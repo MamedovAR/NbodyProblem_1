@@ -1,50 +1,38 @@
-name: Build and Release
+name: CI
+
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: haskell:8.10.4
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Login to Dockerhub
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: my-docker-image:latest
+
+    - name: Run tests in Docker container
+      run: |
+        docker run my-docker-image:latest sh -c "cd /app && stack test"
+
+        - name: Login to Dockerhub
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build Docker image
-        run: docker build .
-      - name: Push Docker image to Dockerhub
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: mamedovar/nbodyproblem:latest
-      - name: Create release
-        id: create_release
-        uses: actions/create-release@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Changes in this release:
-            * Added feature X
-            * Fixed bug Y
-          draft: false
-          prerelease: false
-      - name: Upload binaries
-        uses: actions/upload-artifact@v2
-        with:
-          name: Binaries
-          path: dist/
-      - name: Publish to Dockerhub
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: my-username/my-image:latest
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+    - name: Push image to Dockerhub
+      run: |
+        docker tag my-docker-image:latest <your-dockerhub-username>/my-docker-image:latest
+        docker push <your-dockerhub-username>/my-docker-image:latest
