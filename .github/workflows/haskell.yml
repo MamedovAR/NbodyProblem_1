@@ -1,45 +1,52 @@
-     
-name: Haskell Build and Release
-
+name: Build and Release
 on:
   push:
     branches:
       - main
-      
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: haskell:8.10.4
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Setup Haskell
-        uses: haskell/actions/setup@v1
-        with:
-          ghc-version: '8.10.4'
-      - name: Installing C libraries
-        run: | 
-          sudo apt-get update && sudo apt install python3-pip python3-numpy libgtk2.0-dev libcairo2-dev libpango1.0-dev libglib2.0-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev
       - name: Build project
-        run: |
-          cabal build
-          cabal sdist
+        run: cabal build
+      - name: Login to Dockerhub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build Docker image
+        run: docker build -t my-image .
+      - name: Push Docker image to Dockerhub
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: my-username/my-image:latest
       - name: Create release
         id: create_release
-        uses: actions/create-release@v1.0.0
+        uses: actions/create-release@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v1.0.0
-          release_name: Release v1.0.0
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this release:
+            * Added feature X
+            * Fixed bug Y
           draft: false
           prerelease: false
-      - name: Upload release asset
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload binaries
+        uses: actions/upload-artifact@v2
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./path/to/project
-          asset_name: project
-          asset_content_type: application/zip
+          name: Binaries
+          path: dist/
+      - name: Publish to Dockerhub
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: my-username/my-image:latest
