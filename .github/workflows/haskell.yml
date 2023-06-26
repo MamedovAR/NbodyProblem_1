@@ -10,8 +10,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Build project
-        run: stack setup && stack build
       - name: Login to Dockerhub
         uses: docker/login-action@v1
         with:
