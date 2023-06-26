@@ -7,6 +7,9 @@ When the program start it calculate shots and put some of points in console than
 $ git clone https://github.com/MamedovAR/NbodyProblem_1
 $ cd NbodyProblem_1
 
+or from Dockerhub:
+$ sudo docker run mamedovar/nbodyproblem
+
 Build with cabal:
 $ cabal build
 
