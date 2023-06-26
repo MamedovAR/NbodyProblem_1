@@ -25,9 +25,14 @@ jobs:
     - name: Run tests in Docker container
       run: |
         docker run nbodyproblem:latest sh -c "cd /app && stack test"
+
+    - name: Login to Dockerhub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
       
     - name: Push image to Dockerhub
       run: |
-        docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
         docker tag nbodyproblem:latest mamedovar/nbodyproblem:latest
         docker push mamedovar/nbodyproblem:latest
