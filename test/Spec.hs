@@ -70,7 +70,6 @@ tester1 [k,x,y] = do
         "node.into_next_quadrant()\n" ++
         "f.write(str(node.m)+'\\n'+str(node.s)+'\\n'+str(node.m_pos[0])+'\\n'+str(node.m_pos[1])+'\\n'+str(node.momentum[0])+'\\n'+str(node.momentum[1]))\n"
     system ("python .nbodyproblem/test.py " ++ show k ++ " " ++ show x ++ " " ++ show y)
-    
     answers <- readFile ".nbodyproblem/file_test.txt"
     let ans = lines answers
     removeDirectoryRecursive ".nbodyproblem"
