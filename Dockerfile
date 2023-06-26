@@ -1,4 +1,5 @@
-FROM fpco/stack-build
+FROM haskell
+#fpco/stack-build
 
 WORKDIR /app
 
