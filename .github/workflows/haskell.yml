@@ -24,11 +24,12 @@ jobs:
 
     - name: Run tests in Docker container
       run: |
-        docker build .
+        docker build . -t nbodyproblem
 
       
     - name: Push image to Dockerhub
       run: |
-        docker login -u $secrets.DOCKERHUB_USERNAME -p $secrets.DOCKERHUB_PASSWORD
+        docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+        docker login
         docker tag nbodyproblem:latest mamedovar/nbodyproblem:latest
         docker push mamedovar/nbodyproblem:latest
