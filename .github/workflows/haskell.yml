@@ -20,11 +20,11 @@ jobs:
       with:
         context: .
         push: true
-        tags: my-docker-image:latest
+        tags: nbodyproblem:latest
 
     - name: Run tests in Docker container
       run: |
-        docker run my-docker-image:latest sh -c "cd /app && stack test"
+        docker run nbodyproblem:latest sh -c "cd /app && stack test"
 
         - name: Login to Dockerhub
         uses: docker/login-action@v1
@@ -34,5 +34,5 @@ jobs:
       
     - name: Push image to Dockerhub
       run: |
-        docker tag my-docker-image:latest <your-dockerhub-username>/my-docker-image:latest
-        docker push <your-dockerhub-username>/my-docker-image:latest
+        docker tag nbodyproblem:latest mamedovar/nbodyproblem:latest
+        docker push mamedovar/nbodyproblem:latest
