@@ -20,6 +20,7 @@ ENV DISPLAY=:0
 
 #RUN stack setup
 #RUN stack install gtk2hs-buildtools
+RUN cabal update
 RUN cabal build
 
 CMD ["Xvfb", "-ac", ":0", "-screen", "0", "1024x768x16", "&&", "stack", "exec", "app/NbodyProblem1"]
