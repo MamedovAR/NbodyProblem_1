@@ -13,7 +13,7 @@
 --
 -----------------------------------------------------------------------------
 
-module BurnesAndHut where
+module NBodyProblem.BurnesAndHut where
   
 import Data.IORef
 import System.IO.Unsafe
