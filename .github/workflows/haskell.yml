@@ -31,7 +31,7 @@ jobs:
       uses: docker/login-action@v1
       with:
         username: mamedovar
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
       
     - name: Push image to Dockerhub
       run: |
