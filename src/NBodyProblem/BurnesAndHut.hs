@@ -14,7 +14,7 @@
 -----------------------------------------------------------------------------
 {-# OPTIONS_GHC -Wno-incomplete-record-updates #-}
 
-module BurnesAndHut where
+module NBodyProblem.BurnesAndHut where
   
 import Data.IORef
 import System.IO.Unsafe

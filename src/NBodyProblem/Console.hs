@@ -3,16 +3,11 @@
 module NBodyProblem.Console where
 
 import NBodyProblem.BurnesAndHut
-    ( Node(NoneNode, m_pos), resetTo0thQuadrant, add, verlet )
 import System.IO.Unsafe ( unsafePerformIO )
 import System.Cmd ( system )
 import Data.IORef ( newIORef, readIORef, IORef )
 
-
-
-
 clearConsole = system "clear"
-
 
 showLine :: String -> Int -> IO ()
 showLine ln i = do
@@ -47,11 +42,11 @@ mainFunc bodies theta g dt max_iter sps = do
                 return $ unsafePerformIO $ mainFunc bodies theta g dt (max_iter) (sps++[lst])
 
 rootInit :: IORef Node -> [IORef Node] -> IO (IORef Node)
-rootInit _ [body] = do
-	resetTo0thQuadrant body
-	res <- add body root
-	return res
+rootInit root [body] = do
+        resetTo0thQuadrant body
+        res <- add body root
+        return res
 rootInit root (body:bodies) = do
-	resetTo0thQuadrant body
-	res <- add body root
-	rootInit res bodies
+        resetTo0thQuadrant body
+        res <- add body root
+        rootInit res bodies

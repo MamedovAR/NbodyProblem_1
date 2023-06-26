@@ -1,4 +1,4 @@
-FROM haskell
+FROM ubuntu
 #fpco/stack-build
 
 WORKDIR /app
@@ -6,6 +6,7 @@ WORKDIR /app
 COPY . /app
 
 RUN apt-get update && apt-get install -y \
+    haskell-stack \
     python3-pip \
     python3-numpy \
 	libgtk2.0-dev \
