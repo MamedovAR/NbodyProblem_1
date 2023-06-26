@@ -29,7 +29,7 @@ library
       NBodyProblem.Graphic
       NBodyProblem.Console
   other-modules:
-      NBodyProblem
+      Paths_NBodyProblem
   hs-source-dirs:
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
@@ -45,7 +45,7 @@ library
 executable NBodyProblem-exe
   main-is: Main.hs
   other-modules:
-      NBodyProblem
+      Paths_NBodyProblem
   hs-source-dirs:
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
@@ -57,7 +57,7 @@ test-suite NBodyProblem-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      NBodyProblem
+      Paths_NBodyProblem
   hs-source-dirs:
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
