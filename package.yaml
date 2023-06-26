@@ -39,7 +39,7 @@ library:
   source-dirs: src/NBodyProblem
 
 executables:
-  NbodyProblem1-exe:
+  NbodyProblem1:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
