@@ -17,6 +17,11 @@ Build with stack:
 $ stack build
 $ stack install
 
+From .tar.gz:
+$ tar xvzf dist-newstyle/sdist/NBodyProblem-0.1.0.0.tar.gz
+$ cd dist-newstyle/sdist/NBodyProblem-0.1.0.0
+$ stack build
+
 # Options
 $ NBodyProblem-exe --help
 Simple Haskell implementation of a Barnes-Hut galaxy simulator.
