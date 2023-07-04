@@ -35,5 +35,4 @@ jobs:
       
     - name: Push image to Dockerhub
       run: |
-        docker tag nbodyproblem:latest mamedovar/nbodyproblem:latest
         docker push mamedovar/nbodyproblem:latest
