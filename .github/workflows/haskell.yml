@@ -24,7 +24,9 @@ jobs:
 
     - name: Run tests in Docker container
       run: |
+        echo "----------------------------------------------------------------------------------------\n"
         echo ${{ secrets.DOCKER_USERNAME }}
+        echo "----------------------------------------------------------------------------------------\n"
         docker build . -t mamedovar/nbodyproblem:latest
 #run nbodyproblem:latest sh -c "cd /app && stack test"
 
