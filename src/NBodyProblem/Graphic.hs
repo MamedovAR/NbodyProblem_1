@@ -1,3 +1,4 @@
+
 {-# LANGUAGE CPP #-}
 
 module NBodyProblem.Graphic where 
@@ -57,7 +58,7 @@ display st = do
     clear [ColorBuffer]
     clearColor $= Color4 0 0 0 0
     renderPrimitive Points $ mapM_ drawPoint xs
-    threadDelay 500000 -- ожидание 0.5 секунды
+    threadDelay 100000 -- ожидание 0.5 секунды
     flush
 
 drawPoint :: [GLfloat] -> IO ()

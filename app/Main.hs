@@ -5,8 +5,7 @@ import NBodyProblem.Graphic
 import NBodyProblem.Console
 import System.Environment
 import System.Random
-import Data.IORef
-import GHC.IORef (newIORef)
+import Data.IORef (newIORef)
 
 norm :: [Float] -> Float
 norm xs = sqrt $ sum $ map (^2) xs
@@ -33,19 +32,12 @@ img_iter = 20
 
 -- The pseudo-random number generator is initialized at a deterministic -- value, for proper validation of the output for the exercise series.  random.seed(1)
 -- x- and y-pos are initialized to a square with side-length 2*ini_radius.
-posx = map (\x -> x*2*ini_radius + 0.5-ini_radius) $ take numbodies $ randoms (mkStdGen 13) :: [Float]--random.random(numbodies) 
-posy = map (\x -> x*2*ini_radius + 0.5-ini_radius) $ take numbodies $ randoms (mkStdGen 13) :: [Float]--random.random(numbodies) *2.*ini_radius + 0.5-ini_radius
+posx = map (\x -> x*2*ini_radius + 0.5-ini_radius) $ take numbodies $ randoms (mkStdGen 42) :: [Float]--random.random(numbodies) 
+posy = map (\x -> x*2*ini_radius + 0.5-ini_radius) $ take numbodies $ randoms (mkStdGen 42) :: [Float]--random.random(numbodies) *2.*ini_radius + 0.5-ini_radius
 -- We only keep the bodies inside a circle of radius ini_radius.
 copyCycle body = body{momentum=(map (\t -> t * mass*inivel*(norm r)/ini_radius) [-(r !! 1), (r !! 0)])} where r = zipWith (-) (pos body) [0.5,0.5]
 
-bodies = map copyCycle [ _init mass px py | (px,py) <- zip posx posy, (px-0.5)^2 + (py-0.5)^2 < ini_radius^2 ]
-
-preBodies :: [Node] -> [IORef Node] -> IO [IORef Node]
-preBodies (x:xs) ys = do
-	y <- newIORef x
-	if null xs 
-		then return (ys++[y]) 
-		else preBodies xs (ys++[y])
+bodies = map copyCycle [ initNode mass px py | (px,py) <- zip posx posy, (px-0.5)^2 + (py-0.5)^2 < ini_radius^2 ]
 
 help :: String
 help = "Simple Haskell implementation of a Barnes-Hut galaxy simulator.\n\n./NBodyProblem [OPTION] [OUTPUT]\n\n\t-h, --help - Show supported options.\n" ++ 
@@ -59,8 +51,7 @@ main :: IO ()
 main = do
 	args <- getArgs
 	if length args == 1 then do{putStrLn help} else do{putStrLn ""}
-	bodies' <- preBodies bodies []
-	res <- mainFunc bodies' theta _G dt max_iter []
+	res <- mainFunc bodies theta _G dt max_iter mass inivel ini_radius
 	if length args == 2 then do{writeFile (last args) $ createStr res} else do{putStrLn ""}
 	resRef <- newIORef res
 	showWindow resRef

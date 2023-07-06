@@ -1,4 +1,3 @@
-
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  NBodyProblem.BurnesAndHut
@@ -13,129 +12,134 @@
 --
 -----------------------------------------------------------------------------
 {-# OPTIONS_GHC -Wno-incomplete-record-updates #-}
+{-# LANGUAGE DataKinds #-}
+{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 
 module NBodyProblem.BurnesAndHut where
-  
-import Data.IORef
-import System.IO.Unsafe
 
-replace xs a n = (take n xs) ++ [a] ++ (drop (n+1) xs)
+import Data.List(foldl')
 
--- | A node represents a body if it is an endnote (i.e. if node.child is None)
--- or an abstract node of the quad-tree if it has child.
+data Node = Node { m :: Float
+                 , m_pos :: [Float]
+                 , momentum :: [Float]
+                 , s :: Float
+                 , relpos :: [Float]
+                 , child :: Maybe [Maybe Node]
+                 } deriving(Eq,Show)
 
-data Node = NoneNode | Node {
- m :: Float,
- m_pos :: [Float],
- momentum :: [Float],
- child :: [Node],
- _s :: Float,
- relpos :: [Float]
-} deriving (Show,Read)
+initNode :: Float -> Float -> Float -> Node
+initNode m x y = Node { m = m
+                      , m_pos = [m * x, m * y]
+                      , momentum = [0.0, 0.0]
+                      , s = 1.0
+                      , relpos = [x, y]
+                      , child = Nothing
+                      }
 
--- | The initializer creates a child-less node (an actual body).
-_init :: Float -> Float -> Float -> Node
-_init k x y = Node {m=k,m_pos=[x,y],momentum=[0,0],child=[],_s=1,relpos=[x/k,y/k]}
+intoNextQuadrant :: Node -> ([Node], Int)
+intoNextQuadrant node =
+  let s' = 0.5 * s node
+      subdivide i =
+        let relpos' = relpos node
+            relpos'' =
+              if relpos' !! i * 2.0 < 1.0
+              then relpos'
+              else [head relpos' - 1.0, (relpos' !! 1) - 1.0]
+        in Node { m = m node
+                , m_pos = m_pos node
+                , momentum = momentum node
+                , s = s'
+                , relpos = relpos''
+                , child = Nothing
+                }
+        : _subdivide (node { s = s', relpos = relpos'' }) (i + 1)
+      quadrants = subdivide 0 ++ subdivide 1
+  in (quadrants, 2 * length quadrants)
 
--- | Physical position of node, independent of currently active quadrant.
+_subdivide :: Node -> Int -> [Node]
+_subdivide node i =
+  let relpos' = relpos node
+      relpos'' =
+        if relpos' !! i * 2.0 < 1.0
+        then relpos'
+        else [head relpos' - 1.0, (relpos' !! 1) - 1.0]
+      s' = 0.5 * s node
+  in Node { m = m node
+          , m_pos = m_pos node
+          , momentum = momentum node
+          , s = s'
+          , relpos = relpos''
+          , child = Nothing
+          }
+     : _subdivide (node { s = s', relpos = relpos'' }) ((i + 1) `mod` 2)
+
 pos :: Node -> [Float]
-pos n = [((m_pos n) !! 0)/(m n),((m_pos n) !! 1)/(m n)]
+pos node = let [x, y] = m_pos node in [x / m node, y / m node]
 
-custoffDist :: Float
-custoffDist = 0.002
+resetTo0thQuadrant :: Node -> Node
+resetTo0thQuadrant node = node { s = 1.0, relpos = pos node }
 
--- | Distance between present node and another node.
 dist :: Node -> Node -> Float
-dist n1 n2 = sqrt((((pos n1)!!0)-((pos n2)!!0))^2+(((pos n1)!!1)-((pos n2)!!1))^2)
+dist n1 n2 = let [x1, y1] = pos n1
+                 [x2, y2] = pos n2
+             in sqrt ((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
--- | Force which the present node is exerting on a given body.
-forceOn :: Node -> Node -> [Float]
-forceOn n1 n2 = if d<custoffDist then [0,0] else map (\x -> x*((m n1)*(m n2))^3) $ zipWith (-) (pos n1) (pos n2)
- where d=dist n1 n2
+forceOn :: Node -> Node -> Float -> [Float]
+forceOn n1 n2 theta =
+  let cutoffDist = 0.002
+      d = dist n1 n2
+      f =
+        if d < cutoffDist
+        then [0.0, 0.0]
+        else let [x1, y1] = pos n1
+                 [x2, y2] = pos n2
+                 m1 = m n1
+                 m2 = m n2
+                 f' = [x1 - x2, y1 - y2]
+                 f'' = m1 * m2 / d ** 3
+             in [f'' * head f', f'' * (f' !! 1)]
+  in if child n2 == Nothing || s n2 < dist n1 n2 * theta
+     then f
+     else let Just children = child n2
+              fs = map (\c -> forceOn n1 (fromJust c) theta) children
+          in foldl' (\[x, y] [x', y'] -> [x + x', y + y']) [0.0, 0.0] fs
 
--- | Places node into next-level quadrant along direction i and recomputes
--- the relative position relpos of the node inside this quadrant.
-_subdivide :: IORef Node -> Int -> IO Int
-_subdivide n i = do
- n1 <- readIORef n
- let check1 t = if isNoneNode t then False else (2*((relpos n1)!!i))<1
- if check1 n1 then do
-  writeIORef n (if isNoneNode n1 then NoneNode else n1{relpos=replace (relpos n1) (2*((relpos n1)!!i)) i})
-  return 0 
- else do
-  writeIORef n (if isNoneNode n1 then NoneNode else n1{relpos=replace (relpos n1) (2*((relpos n1)!!i)-1) i})
-  return 1
-  
--- | Places node into next-level quadrant and returns the quadrant number.
-intoNextQuadrant :: IORef Node -> IO Int
-intoNextQuadrant n = do
- modifyIORef n n1
- a <- (_subdivide n 1)
- b <- (_subdivide n 0)
- let c = ((a) + 2*(b))
- return c
- where n1 n2 = if isNoneNode n2 then NoneNode else n2{_s=0.5*(_s n2)}
+add :: Node -> Maybe Node -> Node
+add body Nothing = body
+add body (Just node) =
+  let smallestQuadrant = 1.0e-4
+      node' =
+        if s node > smallestQuadrant
+        then case child node of
+               Nothing ->
+                 let (quadrants, len) = intoNextQuadrant node
+                     node'' = node { child = Just $ replicate len Nothing }
+                 in node'' { child = Just $ zipWith (\ q i -> (if q == quadrants !! 1 then Just $ add body Nothing else i)) quadrants (fromJust $ child node'') }
+               Just children ->
+                 let quadrants = map (\c -> if c == Nothing then add body Nothing else fromJust c) children
+                 in node { child = Just $ map Just quadrants }
+        else node
+  in node' { m = m node + m body
+           , m_pos = let [x, y] = m_pos node in [x + head (m_pos body), y + m_pos body !! 1]
+           }
 
--- | Re-positions the node to the level-0 quadrant (full domain).
-resetTo0thQuadrant :: IORef Node -> IO ()
-resetTo0thQuadrant n = do
- n1 <- readIORef n 
- modifyIORef n (\n2 -> if isNoneNode n2 then NoneNode else n2{_s=1,relpos=pos n1})
+fromJust :: Maybe a -> a
+fromJust (Just x) = x
 
--- | @isNoneNode node@ check is it node NULL.
-isNoneNode :: Node -> Bool
-isNoneNode NoneNode = True
-isNoneNode _ = False
+isNothing :: Maybe a -> Bool
+isNothing Nothing = True
+isNothing (Just _) = False
 
--- | Barnes-Hut algorithm: Creation of the quad-tree. This function adds 
--- a new body into a quad-tree node. Returns an updated version of the node.
-add :: IORef Node -> IORef Node -> IO (IORef Node)
-add body node = do
- body' <- readIORef body
- node' <- readIORef node
- nonen' <- newIORef NoneNode
- let new_node = if isNoneNode node' then body else nonen'
- let smallest_quadrant = 0.0001
- let check1 t = if isNoneNode t then False else _s node' > smallest_quadrant 
- let check2 t = if isNoneNode t then False else null $ child t
- if not $ isNoneNode node' && check1 node' then do
-  if check2 node' then do
-   writeIORef new_node node'
-   modifyIORef new_node (\n_node -> if isNoneNode n_node then NoneNode else n_node{child=replicate 4 NoneNode})
-   quadrant <- intoNextQuadrant node
-   modifyIORef new_node (\x -> if isNoneNode x then NoneNode else x{child=replace (child x) node' quadrant})
-  else do
-   writeIORef new_node node'
-  modifyIORef new_node (\n_node -> if isNoneNode n_node then NoneNode else n_node{m=(m n_node)+ (m body')})
-  modifyIORef new_node (\n_node -> if isNoneNode n_node then NoneNode else n_node{m_pos=(zipWith (+) (m_pos n_node) (m_pos body'))})
-  quadrant <- intoNextQuadrant body
-  new_node' <- readIORef new_node
-  node1' <- newIORef (if not $ isNoneNode new_node' then ((child new_node') !! quadrant) else NoneNode)
-  nncq <- add body node1'
-  nncq' <- readIORef nncq
-  modifyIORef new_node (\n_node -> if isNoneNode n_node then NoneNode else n_node{child=replace (child new_node') nncq' quadrant})
-  return new_node
- else 
-  return new_node
-
--- | Barnes-Hut algorithm: usage of the quad-tree. This function computes
--- the net force on a body exerted by all bodies in node "node".
--- Note how the code is shorter and more expressive than the human-language
--- description of the algorithm.
-forceOn1 :: Node -> Node -> Float -> [Float]
-forceOn1 body node theta
- | null $ child node = forceOn (node) body
- | _s (node) < (dist (node) body)*theta = forceOn (node) body
- | otherwise = [sum(forceOn1 body c theta) | c <- child node, not $ isNoneNode c]
-
--- | Execute a time iteration according to the Verlet algorithm.
-verlet :: [IORef Node] -> Node -> Float -> Float -> Float -> IO ()
-verlet bodies root theta g dt = 
- if null bodies then return () else do
-  let body = head bodies
-  body' <- readIORef body
-  let force = map (\a -> a*g) $ forceOn1 body' root theta
-  modifyIORef body (\a -> a{momentum=zipWith (+) (momentum a) (map (\a -> dt*a) force)})
-  body'' <- readIORef body
-  modifyIORef body (\a -> a{momentum=zipWith (+) (m_pos a) $ map (\b -> b*dt) $ momentum body''})
-  return $ unsafePerformIO $ verlet (tail bodies) root theta g dt
+verlet :: [Node] -> Node -> Float -> Float -> Float -> [Node]
+verlet bodies root theta g dt =
+  let force body = map (g *) $ forceOn body root theta
+      updateBody body =
+        let f = force body
+            [px, py] = m_pos body
+            [vx, vy] = momentum body
+        in body { momentum = [vx + dt * head f, vy + dt * (f !! 1)]
+                , m_pos = [px + dt * (vx + 0.5 * dt * head f), py + dt * (vy + 0.5 * dt * (f !! 1))]
+                }
+  in map updateBody bodies
