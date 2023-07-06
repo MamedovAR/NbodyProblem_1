@@ -45,6 +45,7 @@ mainFunc bodies theta g dt maxIter mass inivel iniRadius = do
                     [vx, vy] = [-ry, rx]
                 in body { momentum = [vx * mass * inivel * sqrt (rx ** 2 + ry ** 2) / iniRadius, vy * mass * inivel * sqrt (rx ** 2 + ry ** 2) / iniRadius] }
         let bodies' = map updateBody' bodies
+        putStrLn "Some preparing"
         let loop :: Int -> [Node] -> [[[Float]]] -> IO [[[Float]]]
             loop i bs lst = do
                 if i >= maxIter
@@ -53,6 +54,8 @@ mainFunc bodies theta g dt maxIter mass inivel iniRadius = do
                         let root = fromJust $ foldl (flip (\a b -> Just $ add a b)) Nothing bs
                         let bs' = verlet bs root theta g dt
                         let lst' = createList bs' []
+                        if length lst' == length lst then putStrLn "In loop preparing" else putStrLn "In loop"
+                        print root
                         showLst lst'
                         loop (i + 1) bs' (lst++[lst'])
         loop 0 bodies' []

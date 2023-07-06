@@ -24,6 +24,7 @@ jobs:
 
     - name: Run tests in Docker container
       run: |
+        echo ${{ secrets.DOCKER_USERNAME }}
         docker build . -t mamedovar/nbodyproblem:latest
 #run nbodyproblem:latest sh -c "cd /app && stack test"
 
@@ -35,5 +36,4 @@ jobs:
       
     - name: Push image to Dockerhub
       run: |
-        echo ${{ secrets.DOCKER_USERNAME }}
         docker push mamedovar/nbodyproblem:latest
