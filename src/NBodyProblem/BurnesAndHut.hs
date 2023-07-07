@@ -1,3 +1,4 @@
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  NBodyProblem.BurnesAndHut
@@ -44,7 +45,7 @@ intoNextQuadrant node =
       subdivide i =
         let relpos' = relpos node
             relpos'' =
-              if relpos' !! i * 2.0 < 1.0
+              if (relpos' !! i) * 2.0 < 1.0
               then relpos'
               else [head relpos' - 1.0, (relpos' !! 1) - 1.0]
         in Node { m = m node
@@ -54,26 +55,48 @@ intoNextQuadrant node =
                 , relpos = relpos''
                 , child = Nothing
                 }
-        : _subdivide (node { s = s', relpos = relpos'' }) (i + 1)
+        : _subdivide (node { s = s', relpos = relpos'' }) (if i < 1 then i + 1 else i) 10
       quadrants = subdivide 0 ++ subdivide 1
   in (quadrants, 2 * length quadrants)
 
-_subdivide :: Node -> Int -> [Node]
-_subdivide node i =
-  let relpos' = relpos node
-      relpos'' =
-        if relpos' !! i * 2.0 < 1.0
-        then relpos'
-        else [head relpos' - 1.0, (relpos' !! 1) - 1.0]
-      s' = 0.5 * s node
-  in Node { m = m node
-          , m_pos = m_pos node
-          , momentum = momentum node
-          , s = s'
-          , relpos = relpos''
-          , child = Nothing
-          }
-     : _subdivide (node { s = s', relpos = relpos'' }) ((i + 1) `mod` 2)
+-- _subdivide :: Node -> Int -> [Node]
+-- _subdivide node i =
+--   let relpos' = relpos node
+--       relpos'' =
+--         if relpos' !! i * 2.0 < 1.0
+--         then [if i==0 then 2.0*head relpos' else head relpos', 
+--           if i==1 then 2.0*(relpos' !! 1) else relpos' !! 1] 
+--         else [if i==0 then 2.0*head relpos' - 1.0 else head relpos', 
+--           if i==1 then 2.0*(relpos' !! 1) - 1.0 else relpos' !! 1]
+--       s' = 0.5 * s node
+--   in Node { m = m node
+--           , m_pos = m_pos node
+--           , momentum = momentum node
+--           , s = s'
+--           , relpos = relpos''
+--           , child = Nothing
+--           }
+--      : _subdivide (node { s = s', relpos = relpos'' }) ((i + 1) `mod` 2)
+_subdivide :: Node -> Int -> Int -> [Node]
+_subdivide node i depth
+  | depth <= 0 = []
+  | otherwise =
+    let relpos' = relpos node
+        relpos'' =
+          if (relpos' !! i) * 2.0 < 1.0
+          then [if i==0 then 2.0*head relpos' else head relpos',
+            if i==1 then 2.0*(relpos' !! 1) else relpos' !! 1]
+          else [if i==0 then 2.0*head relpos' - 1.0 else head relpos',
+            if i==1 then 2.0*(relpos' !! 1) - 1.0 else relpos' !! 1]
+        s' = 0.5 * s node
+        newNode = Node { m = m node
+                       , m_pos = m_pos node
+                       , momentum = momentum node
+                       , s = s'
+                       , relpos = relpos''
+                       , child = Nothing
+                       }
+    in newNode : _subdivide newNode ((i + 1) `mod` 2) (depth - 1)
 
 pos :: Node -> [Float]
 pos node = let [x, y] = m_pos node in [x / m node, y / m node]
@@ -106,7 +129,7 @@ forceOn n1 n2 theta =
               fs = map (\c -> forceOn n1 (fromJust c) theta) children
           in foldl' (\[x, y] [x', y'] -> [x + x', y + y']) [0.0, 0.0] fs
 
-add :: Node -> Maybe Node -> Node
+add :: Node -> Maybe Node -> Node --Ошибка кроется здесь!
 add body Nothing = body
 add body (Just node) =
   let smallestQuadrant = 1.0e-4

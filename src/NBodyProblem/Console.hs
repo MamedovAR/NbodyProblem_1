@@ -54,8 +54,8 @@ mainFunc bodies theta g dt maxIter mass inivel iniRadius = do
                         let root = fromJust $ foldl (flip (\a b -> Just $ add a b)) Nothing bs
                         let bs' = verlet bs root theta g dt
                         let lst' = createList bs' []
-                        if length lst' == length lst then putStrLn "In loop preparing" else putStrLn "In loop"
-                        print root
+--                        if length lst' == length lst then putStrLn "In loop preparing" else putStrLn "In loop"
+--                        print root
                         showLst lst'
                         loop (i + 1) bs' (lst++[lst'])
         loop 0 bodies' []
