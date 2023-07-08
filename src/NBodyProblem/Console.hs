@@ -4,30 +4,34 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use head" #-}
+{-# OPTIONS_GHC -Wno-type-defaults #-}
 
 module NBodyProblem.Console where
 
 import NBodyProblem.BurnesAndHut
-import System.IO.Unsafe ( unsafePerformIO )
+import System.Process (system)
+import GHC.IO.Exception (ExitCode)
 -- import Control.Monad ( when )
 -- import Graphics.UI.GLUT (DataType(Float))
 --import Main (bodies)
 
-clearConsole :: IO ()
-clearConsole = putStr "\ESC[2J"
+clearConsole :: IO ExitCode
+clearConsole = system "clear"--putStr "\ESC[2J"
 
 showLine :: String -> Int -> IO ()
 showLine ln i = do
         if i==(-20) then do {return ()} else do
-                putStrLn $ take 20 $ drop i ln
-                return $ unsafePerformIO $ showLine ln (i-20)
+                putStrLn $ "|" ++ take 20 (drop i ln) ++ "|"
+                showLine ln (i-20)
 
 showLst :: [[Float]] -> IO ()
 showLst lst = do
         let lst' = map ((\a -> (a!!0)*20 + (a!!1)) . map (\a -> round $ a*20)) (if length lst > 20 then take 20 lst else lst)
         let output = [if a `elem` lst' then '.' else ' ' | a <- [0..399]]
-        clearConsole
+        _ <- clearConsole
+        putStrLn "+--------------------+"
         showLine output 380
+        putStrLn "+--------------------+"
         return ()
 
 createList :: [Node] -> [[Float]] -> [[Float]]
