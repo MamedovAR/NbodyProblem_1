@@ -11,32 +11,44 @@ norm :: [Float] -> Float
 norm xs = sqrt $ sum $ map (^2) xs
 
 -- Theta-criterion of the Barnes-Hut algorithm.
+theta :: Float
 theta = 0.5
 -- Mass of a body.
+mass :: Float
 mass = 1.0
 -- Initially, the bodies are distributed inside a circle of radius ini_radius.
+ini_radius :: Float
 ini_radius = 0.1
 -- Initial maximum velocity of the bodies.
+inivel :: Float
 inivel = 0.1
 -- The "gravitational constant" is chosen so as to get a pleasant output.
+_G :: Float
 _G = 0.000004
 -- Discrete time step.
+dt :: Float
 dt = 0.001
 -- Number of bodies (the actual number is smaller, because all bodies
 -- outside the initial radius are removed).
+numbodies :: Int
 numbodies = 1000
 -- Number of time-iterations executed by the program.
+max_iter :: Int
 max_iter = 10000
 -- Frequency at which PNG images are written.
+img_iter :: Integer
 img_iter = 20
 
 -- The pseudo-random number generator is initialized at a deterministic -- value, for proper validation of the output for the exercise series.  random.seed(1)
 -- x- and y-pos are initialized to a square with side-length 2*ini_radius.
+posx :: [Float]
 posx = map (\x -> x*2*ini_radius + 0.5-ini_radius) $ take numbodies $ randoms (mkStdGen 42) :: [Float]--random.random(numbodies) 
+posy :: [Float]
 posy = map (\x -> x*2*ini_radius + 0.5-ini_radius) $ take numbodies $ randoms (mkStdGen 42) :: [Float]--random.random(numbodies) *2.*ini_radius + 0.5-ini_radius
 -- We only keep the bodies inside a circle of radius ini_radius.
 --copyCycle body = body{momentum=(map (\t -> t * mass*inivel*(norm r)/ini_radius) [-(r !! 1), (r !! 0)])} where r = zipWith (-) (pos body) [0.5,0.5]
 
+bodies :: [Node]
 bodies = [ initNode mass px py | (px,py) <- zip posx posy, (px-0.5)^2 + (py-0.5)^2 < ini_radius^2 ]
 
 help :: String
