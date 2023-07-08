@@ -26,10 +26,9 @@ showLine ln i = do
 
 showLst :: [[Float]] -> IO ()
 showLst lst = do
-        let lst' = map ((\a -> (a!!0)*20 + (a!!1)) . map (\a -> round $ a*20)) (if length lst > 20 then take 20 lst else lst)
+        let lst' = map ((\a -> (a!!0)*20 + (a!!1)) . map (\a -> round $ a*20)) (if length lst > 50 then take 50 lst else lst)
         let output = [if a `elem` lst' then '.' else ' ' | a <- [0..399]]
         _ <- clearConsole
-        putStrLn "+--------------------+"
         showLine output 380
         putStrLn "+--------------------+"
         return ()

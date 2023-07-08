@@ -50,7 +50,13 @@ executable NBodyProblem-exe
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      NBodyProblem, base, GLUT, random, time, process, directory
+      NBodyProblem,
+      base,
+      GLUT,
+      random,
+      time,
+      process,
+      directory
   default-language: Haskell2010
 
 test-suite NBodyProblem-test
@@ -62,5 +68,12 @@ test-suite NBodyProblem-test
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      NBodyProblem, base, QuickCheck, GLUT, time, process, directory, random
+      NBodyProblem,
+      base,
+      QuickCheck,
+      GLUT,
+      time,
+      process,
+      directory,
+      random
   default-language: Haskell2010

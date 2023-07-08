@@ -55,7 +55,7 @@ intoNextQuadrant node =
                 , relpos = relpos''
                 , child = Nothing
                 }
-        : _subdivide (node { s = s', relpos = relpos'' }) (if i < 1 then i + 1 else i) 1000
+        : _subdivide (node { s = s', relpos = relpos'' }) (if i < 1 then i + 1 else i) 1
       quadrants = subdivide 0 ++ subdivide 1
   in (quadrants, 2 * length quadrants)
 

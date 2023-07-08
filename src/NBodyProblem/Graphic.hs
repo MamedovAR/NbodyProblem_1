@@ -18,7 +18,7 @@ import Graphics.UI.GLUT
       destroyWindow,
       ClearBuffer(ColorBuffer),
       PrimitiveMode(Points),
-      Vertex2(Vertex2),
+      Vertex3(Vertex3),
       Color4(Color4),
       Vertex(vertex),
       GLfloat,
@@ -58,13 +58,13 @@ display st = do
     clear [ColorBuffer]
     clearColor $= Color4 0 0 0 0
     renderPrimitive Points $ mapM_ drawPoint xs
-    threadDelay 100000 -- ожидание 0.5 секунды
+    threadDelay 10000 -- ожидание 0.5 секунды
     flush
 
 drawPoint :: [GLfloat] -> IO ()
 drawPoint xs = do
     currentColor $= Color4 0 0 1 0
-    vertex (Vertex2 (head xs) (xs!!1))
+    vertex (Vertex3 (head xs - 0.5) (xs!!1 - 0.5) 0.0)
 
 idle :: IORef [[Float]] -> IORef [[[Float]]] -> IO ()
 idle st lst = do
