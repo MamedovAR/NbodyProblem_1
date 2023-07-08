@@ -47,7 +47,7 @@ intoNextQuadrant node =
             relpos'' =
               if (relpos' !! i) * 2.0 < 1.0
               then relpos'
-              else [head relpos' - 1.0, (relpos' !! 1) - 1.0]
+              else [if i==0 then 2.0*head relpos' - 1.0 else head relpos', if i==1 then (relpos' !! 1)*2.0 - 1.0 else relpos' !! 1]
         in Node { m = m node
                 , m_pos = m_pos node
                 , momentum = momentum node
