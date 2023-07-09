@@ -13,12 +13,9 @@ norm xs = sqrt $ sum $ map (^2) xs
 -- Theta-criterion of the Barnes-Hut algorithm.
 theta :: Float
 theta = 0.5
--- Mass of a body.
-mass :: Float
-mass = 1.0
 -- Initially, the bodies are distributed inside a circle of radius ini_radius.
 ini_radius :: Float
-ini_radius = 0.1
+ini_radius = 0.5
 -- Initial maximum velocity of the bodies.
 inivel :: Float
 inivel = 0.1
@@ -35,21 +32,24 @@ numbodies = 1000
 -- Number of time-iterations executed by the program.
 max_iter :: Int
 max_iter = 10000
--- Frequency at which PNG images are written.
-img_iter :: Integer
-img_iter = 20
+-- -- Frequency at which PNG images are written.
+-- img_iter :: Integer
+-- img_iter = 20
 
 -- The pseudo-random number generator is initialized at a deterministic -- value, for proper validation of the output for the exercise series.  random.seed(1)
 -- x- and y-pos are initialized to a square with side-length 2*ini_radius.
 posx :: [Float]
-posx = map (\x -> x*2*ini_radius + 0.5-ini_radius) $ take numbodies $ randoms (mkStdGen 42) :: [Float]--random.random(numbodies) 
+posx = map (\x -> x*2*ini_radius + 0.5-ini_radius) $ take numbodies $ randoms (mkStdGen 529) :: [Float]--random.random(numbodies) 
 posy :: [Float]
-posy = map (\x -> x*2*ini_radius + 0.5-ini_radius) $ take numbodies $ randoms (mkStdGen 42) :: [Float]--random.random(numbodies) *2.*ini_radius + 0.5-ini_radius
+posy = map (\x -> x*2*ini_radius + 0.5-ini_radius) $ take numbodies $ randoms (mkStdGen 1000) :: [Float]--random.random(numbodies) *2.*ini_radius + 0.5-ini_radius
+-- Mass of a body.
+mass :: [Float]
+mass = map abs $ take numbodies $ repeat 1--randoms (mkStdGen 432) :: [Float]
 -- We only keep the bodies inside a circle of radius ini_radius.
 --copyCycle body = body{momentum=(map (\t -> t * mass*inivel*(norm r)/ini_radius) [-(r !! 1), (r !! 0)])} where r = zipWith (-) (pos body) [0.5,0.5]
 
 bodies :: [Node]
-bodies = [ initNode mass px py | (px,py) <- zip posx posy, (px-0.5)^2 + (py-0.5)^2 < ini_radius^2 ]
+bodies = [initNode 1000000 0.9 0.9]++[ initNode ms px py | (ms,px,py) <- zip3 mass posx posy, (px-0.5)^2 + (py-0.5)^2 < ini_radius^2 ]
 
 help :: String
 help = "Simple Haskell implementation of a Barnes-Hut galaxy simulator.\n\n./NBodyProblem [OPTION] [OUTPUT]\n\n\t-h, --help - Show supported options.\n" ++ 
@@ -64,7 +64,7 @@ main = do
 	args <- getArgs
 	if length args == 1 then do{putStrLn help} else do{putStrLn ""}
 	if null bodies then putStrLn "Not bodies" else putStrLn "Bodies exist"
-	res <- mainFunc bodies theta _G dt max_iter mass inivel ini_radius
+	res <- mainFunc bodies theta _G dt max_iter inivel ini_radius
 	if length args == 2 then do{writeFile (last args) $ createStr res} else do{putStrLn ""}
 	resRef <- newIORef res
 	showWindow resRef

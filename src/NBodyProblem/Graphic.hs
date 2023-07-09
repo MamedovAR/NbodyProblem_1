@@ -1,4 +1,18 @@
 
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  NBodyProblem.BurnesAndHut
+-- Copyright   :  (c) Artem Mamedov (2023)
+-- License     :  LGPL-style (see the LICENSE file)
+--
+-- Maintainer  :  a.mamedov1@g.nsu.ru
+-- Stability   :  provisional
+-- Portability :  portable
+--
+-- The simple Haskell implementation of a Barnes-Hut galaxy simulator.
+--
+-----------------------------------------------------------------------------
+
 {-# LANGUAGE CPP #-}
 
 module NBodyProblem.Graphic where 
@@ -25,6 +39,8 @@ import Graphics.UI.GLUT
       HasSetter(($=)) )
 import Data.IORef ( IORef, newIORef, readIORef, writeIORef, modifyIORef )
 import Control.Concurrent (threadDelay)
+
+-- | This function need for visualize with process by graphical interface.
 
 showWindow :: IORef [[[Float]]] -> IO ()
 showWindow lst = do

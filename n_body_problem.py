@@ -164,8 +164,6 @@ def plot_bodies(bodies, i):
 
 # Theta-criterion of the Barnes-Hut algorithm.
 theta = 0.5
-# Mass of a body.
-mass = 1.0
 # Initially, the bodies are distributed inside a circle of radius ini_radius.
 ini_radius = 0.1
 # Initial maximum velocity of the bodies.
@@ -177,10 +175,12 @@ dt = 1.e-3
 # Number of bodies (the actual number is smaller, because all bodies
 # outside the initial radius are removed).
 numbodies = 1000
+# Mass of a body.
+mass = random.random(numbodies) #1.0
 # Number of time-iterations executed by the program.
 max_iter = 10000
 # Frequency at which PNG images are written.
-img_iter = 20
+img_iter = 200
 
 # The pseudo-random number generator is initialized at a deterministic # value, for proper validation of the output for the exercise series.  random.seed(1)
 # x- and y-pos are initialized to a square with side-length 2*ini_radius.
@@ -188,7 +188,7 @@ random.seed(1)
 posx = random.random(numbodies) *2.*ini_radius + 0.5-ini_radius
 posy = random.random(numbodies) *2.*ini_radius + 0.5-ini_radius
 # We only keep the bodies inside a circle of radius ini_radius.
-bodies = [ Node(mass, px, py) for (px,py) in zip(posx, posy) \
+bodies = [ Node(pm, px, py) for (pm,px,py) in zip(mass,posx, posy) \
                if (px-0.5)**2 + (py-0.5)**2 < ini_radius**2 ]
 
 #input("Press the <ENTER> key to continue...")
@@ -198,7 +198,7 @@ bodies = [ Node(mass, px, py) for (px,py) in zip(posx, posy) \
 # "galaxy-like" impression.
 for body in bodies:
     r = body.pos() - array([0.5,0.5])
-    body.momentum = array([-r[1], r[0]]) * mass*inivel*norm(r)/ini_radius
+    body.momentum = array([-r[1], r[0]]) * body.m*inivel*norm(r)/ini_radius
 
 # Principal loop over time iterations.
 for i in range(max_iter):

@@ -12,6 +12,7 @@
 -- The simple Haskell implementation of a Barnes-Hut galaxy simulator.
 --
 -----------------------------------------------------------------------------
+
 {-# OPTIONS_GHC -Wno-incomplete-record-updates #-}
 {-# LANGUAGE DataKinds #-}
 {-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
@@ -22,6 +23,8 @@ module NBodyProblem.BurnesAndHut where
 
 import Data.List(foldl')
 
+-- | A node represents a body if it is an endnote (i.e. if node.child is None) or an abstract node of the quad-tree if it has child.
+-- Instead of storing the position of a node, we store the mass times position, m_pos. This makes it easier to update the center-of-mass.
 data Node = Node { m :: Float
                  , m_pos :: [Float]
                  , momentum :: [Float]
@@ -30,6 +33,7 @@ data Node = Node { m :: Float
                  , child :: Maybe [Maybe Node]
                  } deriving(Eq,Show)
 
+-- | The initializer creates a child-less node (an actual body).
 initNode :: Float -> Float -> Float -> Node
 initNode m x y = Node { m = m
                       , m_pos = [m * x, m * y]
@@ -39,6 +43,7 @@ initNode m x y = Node { m = m
                       , child = Nothing
                       }
 
+-- | Places node into next-level quadrant and returns the quadrant number.
 intoNextQuadrant :: Node -> ([Node], Int)
 intoNextQuadrant node =
   let s' = 0.5 * s node
@@ -55,7 +60,7 @@ intoNextQuadrant node =
                 , relpos = relpos''
                 , child = Nothing
                 }
-        : _subdivide (node { s = s', relpos = relpos'' }) (if i < 1 then i + 1 else i) 1
+        : _subdivide (node { s = s', relpos = relpos'' }) (if i < 1 then i + 1 else i) 4
       quadrants = subdivide 0 ++ subdivide 1
   in (quadrants, 2 * length quadrants)
 
@@ -77,6 +82,8 @@ intoNextQuadrant node =
 --           , child = Nothing
 --           }
 --      : _subdivide (node { s = s', relpos = relpos'' }) ((i + 1) `mod` 2)
+
+-- | Places node into next-level quadrant along direction i and recomputes the relative position relpos of the node inside this quadrant.
 _subdivide :: Node -> Int -> Int -> [Node]
 _subdivide node i depth
   | depth <= 0 = []
@@ -98,20 +105,24 @@ _subdivide node i depth
                        }
     in newNode : _subdivide newNode ((i + 1) `mod` 2) (depth - 1)
 
+-- | Physical position of node, independent of currently active quadrant.
 pos :: Node -> [Float]
 pos node = let [x, y] = m_pos node in [x / m node, y / m node]
 
+-- | Re-positions the node to the level-0 quadrant (full domain).
 resetTo0thQuadrant :: Node -> Node
 resetTo0thQuadrant node = node { s = 1.0, relpos = pos node }
 
+-- | Distance between present node and another node.
 dist :: Node -> Node -> Float
 dist n1 n2 = let [x1, y1] = pos n1
                  [x2, y2] = pos n2
              in sqrt ((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
+-- | Force which the present node is exerting on a given body.
 forceOn :: Node -> Node -> Float -> [Float]
 forceOn n1 n2 theta =
-  let cutoffDist = 0.002
+  let cutoffDist = 0.02
       d = dist n1 n2
       f =
         if d < cutoffDist
@@ -129,10 +140,11 @@ forceOn n1 n2 theta =
               fs = map (\c -> forceOn n1 (fromJust c) theta) children
           in foldl' (\[x, y] [x', y'] -> [x + x', y + y']) [0.0, 0.0] fs
 
+-- | Barnes-Hut algorithm: Creation of the quad-tree. This function adds a new body into a quad-tree node. Returns an updated version of the node.
 add :: Node -> Maybe Node -> Node --Ошибка кроется здесь!
 add body Nothing = body
 add body (Just node) =
-  let smallestQuadrant = 1.0e-4
+  let smallestQuadrant = 1.0e-6
       node' =
         if s node > smallestQuadrant
         then case child node of
@@ -155,6 +167,7 @@ isNothing :: Maybe a -> Bool
 isNothing Nothing = True
 isNothing (Just _) = False
 
+-- | Execute a time iteration according to the Verlet algorithm.
 verlet :: [Node] -> Node -> Float -> Float -> Float -> [Node]
 verlet bodies root theta g dt =
   let force body = map (g *) $ forceOn body root theta

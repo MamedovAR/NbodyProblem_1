@@ -1,3 +1,16 @@
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  NBodyProblem.BurnesAndHut
+-- Copyright   :  (c) Artem Mamedov (2023)
+-- License     :  LGPL-style (see the LICENSE file)
+--
+-- Maintainer  :  a.mamedov1@g.nsu.ru
+-- Stability   :  provisional
+-- Portability :  portable
+--
+-- The simple Haskell implementation of a Barnes-Hut galaxy simulator.
+--
+-----------------------------------------------------------------------------
 
 {-# LANGUAGE CPP #-}
 {-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
@@ -15,9 +28,12 @@ import GHC.IO.Exception (ExitCode)
 -- import Graphics.UI.GLUT (DataType(Float))
 --import Main (bodies)
 
+-- | Clean terminal.
 clearConsole :: IO ExitCode
 clearConsole = system "clear"--putStr "\ESC[2J"
 
+
+-- | Visualize in a terminal.
 showLine :: String -> Int -> IO ()
 showLine ln i = do
         if i==(-20) then do {return ()} else do
@@ -26,27 +42,29 @@ showLine ln i = do
 
 showLst :: [[Float]] -> IO ()
 showLst lst = do
-        let lst' = map ((\a -> (a!!0)*20 + (a!!1)) . map (\a -> round $ a*20)) (if length lst > 50 then take 50 lst else lst)
-        let output = [if a `elem` lst' then '.' else ' ' | a <- [0..399]]
-        _ <- clearConsole
+        let lst' = map ((\a -> (a!!0)*20 + (a!!1)) . map (\a -> round $ a*20)) lst
+        let output = reverse [if a `elem` lst' then '.' else ' ' | a <- [0..399]]
+--        _ <- clearConsole
         showLine output 380
         putStrLn "+--------------------+"
         return ()
 
+-- | Preparing for print.
 createList :: [Node] -> [[Float]] -> [[Float]]
 createList [] lst = lst
-createList bodies lst = createList (tail bodies) (lst++[m_pos $ head bodies])
+createList bodies lst = createList (tail bodies) (lst++[pos $ head bodies])
 -- createList bodies lst = do
 --         if null bodies then return lst else do
 --                 let body = head bodies
 --                 return $ unsafePerformIO $ createList (tail bodies) (lst++[m_pos body])
 
-mainFunc :: [Node] -> Float -> Float -> Float -> Int -> Float -> Float -> Float -> IO [[[Float]]]
-mainFunc bodies theta g dt maxIter mass inivel iniRadius = do
+-- | Main calculations.
+mainFunc :: [Node] -> Float -> Float -> Float -> Int -> Float -> Float -> IO [[[Float]]]
+mainFunc bodies theta g dt maxIter inivel iniRadius = do
         let updateBody' body =
                 let [rx, ry] = let [x, y] = m_pos body in [x - 0.5, y - 0.5]
                     [vx, vy] = [-ry, rx]
-                in body { momentum = [vx * mass * inivel * sqrt (rx ** 2 + ry ** 2) / iniRadius, vy * mass * inivel * sqrt (rx ** 2 + ry ** 2) / iniRadius] }
+                in body { momentum = [vx * m body * inivel * sqrt (rx ** 2 + ry ** 2) / iniRadius, vy * m body * inivel * sqrt (rx ** 2 + ry ** 2) / iniRadius] }
         let bodies' = map updateBody' bodies
         putStrLn "Some preparing"
         let loop :: Int -> [Node] -> [[[Float]]] -> IO [[[Float]]]
