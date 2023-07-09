@@ -7,7 +7,7 @@ COPY . /app
 RUN bash script.sh
 RUN apt-get update && apt install -y \
     python3-pip \
-    python3-numpy \
+    python3-numpy
 #     libgtk2.0-dev \
 #     libcairo2-dev \
 #     libpango1.0-dev \
